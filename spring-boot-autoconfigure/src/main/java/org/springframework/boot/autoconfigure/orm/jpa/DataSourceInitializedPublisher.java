@@ -46,7 +46,9 @@ class DataSourceInitializedPublisher implements BeanPostProcessor {
 
 	private DataSource dataSource;
 
-	private JpaProperties properties;
+	private JpaProperties jpaProperties;
+
+	private HibernateProperties hibernateProperties;
 
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName)
@@ -62,7 +64,10 @@ class DataSourceInitializedPublisher implements BeanPostProcessor {
 			this.dataSource = (DataSource) bean;
 		}
 		if (bean instanceof JpaProperties) {
-			this.properties = (JpaProperties) bean;
+			this.jpaProperties = (JpaProperties) bean;
+		}
+		if (bean instanceof HibernateProperties) {
+			this.hibernateProperties = (HibernateProperties) bean;
 		}
 		if (bean instanceof EntityManagerFactory) {
 			publishEventIfRequired((EntityManagerFactory) bean);
@@ -86,11 +91,11 @@ class DataSourceInitializedPublisher implements BeanPostProcessor {
 	}
 
 	private boolean isInitializingDatabase(DataSource dataSource) {
-		if (this.properties == null) {
+		if (this.jpaProperties == null) {
 			return true; // better safe than sorry
 		}
-		Map<String, String> hibernate = this.properties
-				.getHibernateProperties(dataSource);
+		Map<String, String> hibernate = this.hibernateProperties
+				.getHibernateProperties(this.jpaProperties.getProperties(), dataSource);
 		if (hibernate.containsKey("hibernate.hbm2ddl.auto")) {
 			return true;
 		}

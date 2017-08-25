@@ -73,53 +73,7 @@ public class JpaPropertiesTests {
 				SpringImplicitNamingStrategy.class.getName());
 	}
 
-	@Test
-	public void hibernate5CustomNamingStrategies() throws Exception {
-		JpaProperties properties = load(
-				"spring.jpa.hibernate.naming.implicit-strategy:com.example.Implicit",
-				"spring.jpa.hibernate.naming.physical-strategy:com.example.Physical");
-		Map<String, String> hibernateProperties = properties
-				.getHibernateProperties(mockStandaloneDataSource());
-		assertThat(hibernateProperties).contains(
-				entry("hibernate.implicit_naming_strategy", "com.example.Implicit"),
-				entry("hibernate.physical_naming_strategy", "com.example.Physical"));
-		assertThat(hibernateProperties)
-				.doesNotContainKeys("hibernate.ejb.naming_strategy");
-	}
 
-	@Test
-	public void hibernate5CustomNamingStrategiesViaJpaProperties() throws Exception {
-		JpaProperties properties = load(
-				"spring.jpa.properties.hibernate.implicit_naming_strategy:com.example.Implicit",
-				"spring.jpa.properties.hibernate.physical_naming_strategy:com.example.Physical");
-		Map<String, String> hibernateProperties = properties
-				.getHibernateProperties(mockStandaloneDataSource());
-		// You can override them as we don't provide any default
-		assertThat(hibernateProperties).contains(
-				entry("hibernate.implicit_naming_strategy", "com.example.Implicit"),
-				entry("hibernate.physical_naming_strategy", "com.example.Physical"));
-		assertThat(hibernateProperties)
-				.doesNotContainKeys("hibernate.ejb.naming_strategy");
-	}
-
-	@Test
-	public void useNewIdGeneratorMappingsDefault() throws Exception {
-		JpaProperties properties = load();
-		Map<String, String> hibernateProperties = properties
-				.getHibernateProperties(mockStandaloneDataSource());
-		assertThat(hibernateProperties)
-				.containsEntry(AvailableSettings.USE_NEW_ID_GENERATOR_MAPPINGS, "true");
-	}
-
-	@Test
-	public void useNewIdGeneratorMappingsFalse() throws Exception {
-		JpaProperties properties = load(
-				"spring.jpa.hibernate.use-new-id-generator-mappings:false");
-		Map<String, String> hibernateProperties = properties
-				.getHibernateProperties(mockStandaloneDataSource());
-		assertThat(hibernateProperties)
-				.containsEntry(AvailableSettings.USE_NEW_ID_GENERATOR_MAPPINGS, "false");
-	}
 
 	@Test
 	public void determineDatabaseNoCheckIfDatabaseIsSet() throws SQLException {

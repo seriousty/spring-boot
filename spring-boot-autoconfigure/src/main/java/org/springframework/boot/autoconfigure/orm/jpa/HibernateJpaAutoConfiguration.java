@@ -37,6 +37,7 @@ import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration.HibernateEntityManagerCondition;
 import org.springframework.boot.autoconfigure.transaction.TransactionManagerCustomizers;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.orm.jpa.hibernate.SpringJtaPlatform;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
@@ -63,6 +64,7 @@ import org.springframework.util.ClassUtils;
 @ConditionalOnClass({ LocalContainerEntityManagerFactoryBean.class, EntityManager.class })
 @Conditional(HibernateEntityManagerCondition.class)
 @AutoConfigureAfter({ DataSourceAutoConfiguration.class })
+@EnableConfigurationProperties(HibernateProperties.class)
 public class HibernateJpaAutoConfiguration extends JpaBaseConfiguration {
 
 	private static final Log logger = LogFactory
@@ -85,12 +87,16 @@ public class HibernateJpaAutoConfiguration extends JpaBaseConfiguration {
 			"org.hibernate.engine.transaction.jta.platform.internal.WebSphereExtendedJtaPlatform",
 			"org.hibernate.service.jta.platform.internal.WebSphereExtendedJtaPlatform", };
 
+	private final HibernateProperties hibernateProperties;
+
 	public HibernateJpaAutoConfiguration(DataSource dataSource,
 			JpaProperties jpaProperties,
+			HibernateProperties hibernateProperties,
 			ObjectProvider<JtaTransactionManager> jtaTransactionManager,
 			ObjectProvider<TransactionManagerCustomizers> transactionManagerCustomizers) {
 		super(dataSource, jpaProperties, jtaTransactionManager,
 				transactionManagerCustomizers);
+		this.hibernateProperties = hibernateProperties;
 	}
 
 	@Override
@@ -101,7 +107,8 @@ public class HibernateJpaAutoConfiguration extends JpaBaseConfiguration {
 	@Override
 	protected Map<String, Object> getVendorProperties() {
 		Map<String, Object> vendorProperties = new LinkedHashMap<>();
-		vendorProperties.putAll(getProperties().getHibernateProperties(getDataSource()));
+		vendorProperties.putAll(this.hibernateProperties.getHibernateProperties(
+				getProperties().getProperties(), getDataSource()));
 		return vendorProperties;
 	}
 

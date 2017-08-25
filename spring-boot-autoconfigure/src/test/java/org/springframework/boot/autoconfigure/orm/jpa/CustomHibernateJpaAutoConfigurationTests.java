@@ -74,9 +74,12 @@ public class CustomHibernateJpaAutoConfigurationTests {
 				PropertyPlaceholderAutoConfiguration.class,
 				HibernateJpaAutoConfiguration.class);
 		this.context.refresh();
-		JpaProperties bean = this.context.getBean(JpaProperties.class);
+		JpaProperties jpaProperties = this.context.getBean(JpaProperties.class);
+		HibernateProperties hibernateProperties = this.context.getBean(
+				HibernateProperties.class);
 		DataSource dataSource = this.context.getBean(DataSource.class);
-		String actual = bean.getHibernateProperties(dataSource)
+		String actual = hibernateProperties.getHibernateProperties(
+				jpaProperties.getProperties(), dataSource)
 				.get("hibernate.hbm2ddl.auto");
 		// Default is generic and safe
 		assertThat(actual).isNull();
@@ -90,9 +93,12 @@ public class CustomHibernateJpaAutoConfigurationTests {
 				PropertyPlaceholderAutoConfiguration.class,
 				HibernateJpaAutoConfiguration.class);
 		this.context.refresh();
-		JpaProperties bean = this.context.getBean(JpaProperties.class);
+		JpaProperties jpaProperties = this.context.getBean(JpaProperties.class);
+		HibernateProperties hibernateProperties = this.context.getBean(
+				HibernateProperties.class);
 		DataSource dataSource = this.context.getBean(DataSource.class);
-		String actual = bean.getHibernateProperties(dataSource)
+		String actual = hibernateProperties.getHibernateProperties(
+				jpaProperties.getProperties(), dataSource)
 				.get("hibernate.hbm2ddl.auto");
 		assertThat(actual).isEqualTo("create-drop");
 	}
@@ -107,10 +113,13 @@ public class CustomHibernateJpaAutoConfigurationTests {
 				PropertyPlaceholderAutoConfiguration.class,
 				HibernateJpaAutoConfiguration.class);
 		this.context.refresh();
-		JpaProperties bean = this.context.getBean(JpaProperties.class);
+		JpaProperties jpaProperties = this.context.getBean(JpaProperties.class);
+		HibernateProperties hibernateProperties = this.context.getBean(
+				HibernateProperties.class);
 		DataSource dataSource = this.context.getBean(DataSource.class);
-		Map<String, String> hibernateProperties = bean.getHibernateProperties(dataSource);
-		assertThat(hibernateProperties.get("hibernate.ejb.naming_strategy")).isNull();
+		assertThat(hibernateProperties.getHibernateProperties(
+				jpaProperties.getProperties(), dataSource)
+				.get("hibernate.ejb.naming_strategy")).isNull();
 	}
 
 	@Test
